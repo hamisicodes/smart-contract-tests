@@ -21,7 +21,6 @@ contract Token is ERC1155("") {
 
     function _mintToken(uint256 token_id, uint256 amount) internal {
         _mint(msg.sender, token_id, amount, "");
-
     }
 
     function mintToken(uint256 token_id, uint256 amount) external {
