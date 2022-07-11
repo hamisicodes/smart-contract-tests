@@ -54,10 +54,47 @@ describe("Token", async () => {
         new BigNumber.from("10")
       );
       expect(await contract.getBalance(1)).to.be.equal(
-        new BigNumber.from("15"));
+        new BigNumber.from("15")
+      );
       expect(await contract.getBalance(2)).to.be.equal(
         new BigNumber.from("25")
       );
+    });
+  });
+
+  describe("mintReverted", async () => {
+    context("Cool down", async () => {
+      it("Should prevent mint during cool down period", async () => {
+        const tx1 = await contract.mintToken(0, 10);
+        await tx1.wait();
+
+        await expect(contract.mintToken(1, 15)).to.be.revertedWith(
+          "1-minute cooldown between mints"
+        );
+
+        provider.send("evm_increaseTime", [60 + 1]);
+        await expect(contract.mintToken(1, 15)).to.not.be.reverted;
+      });
+    });
+
+    context("Invalid Token", async () => {
+      it("Should revert if token id is neither 0,1 or 2", async () => {
+        await expect(contract.mintToken(3, 10)).to.be.revertedWith(
+          "cannot mint token"
+        );
+
+        await expect(contract.mintToken(4, 10)).to.be.revertedWith(
+          "cannot mint token"
+        );
+
+        await expect(contract.mintToken(5, 10)).to.be.revertedWith(
+          "cannot mint token"
+        );
+
+        await expect(contract.mintToken(6, 10)).to.be.revertedWith(
+          "cannot mint token"
+        );
+      });
     });
   });
 });
