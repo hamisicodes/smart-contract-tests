@@ -2,9 +2,10 @@ const { expect } = require("chai");
 const { ethers } = require("hardhat");
 const { BigNumber } = ethers;
 
-describe("Token", () => {
+describe("Token", async () => {
   let contract = null;
   let accounts = null;
+  let provider = await ethers.provider;
 
   beforeEach(async () => {
     accounts = await ethers.getSigners();
@@ -22,6 +23,41 @@ describe("Token", () => {
       expect(await contract.FOUR()).to.be.equal(new BigNumber.from("4"));
       expect(await contract.FIVE()).to.be.equal(new BigNumber.from("5"));
       expect(await contract.SIX()).to.be.equal(new BigNumber.from("6"));
+    });
+  });
+
+  describe("mintToken", async () => {
+    it("Should only mint token 0, 1 or 2", async () => {
+      const tx1 = await contract.mintToken(0, 10);
+      await tx1.wait();
+
+      expect(await contract.getBalance(0)).to.be.equal(
+        new BigNumber.from("10")
+      );
+
+      provider.send("evm_increaseTime", [60 + 1]);
+      const tx2 = await contract.mintToken(1, 15);
+      await tx2.wait();
+
+      expect(await contract.getBalance(0)).to.be.equal(
+        new BigNumber.from("10")
+      );
+      expect(await contract.getBalance(1)).to.be.equal(
+        new BigNumber.from("15")
+      );
+
+      provider.send("evm_increaseTime", [60 + 1]);
+      const tx3 = await contract.mintToken(2, 25);
+      await tx3.wait();
+
+      expect(await contract.getBalance(0)).to.be.equal(
+        new BigNumber.from("10")
+      );
+      expect(await contract.getBalance(1)).to.be.equal(
+        new BigNumber.from("15"));
+      expect(await contract.getBalance(2)).to.be.equal(
+        new BigNumber.from("25")
+      );
     });
   });
 });
