@@ -234,16 +234,72 @@ describe("Token", async () => {
       });
 
       it("should revert forge when there is an invalid tokens", async () => {
-        await expect(contract.mintSix([0, 1, 3], [10, 10, 10])).to.be.revertedWith(
-          "invalid tokens"
-        );
+        await expect(
+          contract.mintSix([0, 1, 3], [10, 10, 10])
+        ).to.be.revertedWith("invalid tokens");
       });
 
       it("should revert forge when same amounts are not provided", async () => {
-        await expect(contract.mintSix([0, 1, 2], [10, 5, 10])).to.be.revertedWith(
-          "same amounts required"
-        );
+        await expect(
+          contract.mintSix([0, 1, 2], [10, 5, 10])
+        ).to.be.revertedWith("same amounts required");
       });
     });
+  });
+
+  describe("burnToken", async () => {
+    beforeEach(async () => {
+      const tx1 = await contract.mintToken(0, 20);
+      await tx1.wait();
+
+      provider.send("evm_increaseTime", [60 + 1]);
+
+      const tx2 = await contract.mintToken(1, 20);
+      await tx2.wait();
+
+      provider.send("evm_increaseTime", [60 + 1]);
+
+      const tx3 = await contract.mintToken(2, 20);
+      await tx3.wait();
+
+      const tx4 = await contract.mintThree([0, 1], [5, 5]);
+      await tx4.wait();
+
+      const tx5 = await contract.mintFour([1, 2], [5, 5]);
+      await tx5.wait();
+
+      const tx6 = await contract.mintFive([0, 2], [5, 5]);
+      await tx6.wait();
+
+      const tx7 = await contract.mintSix([0, 1, 2], [5, 5, 5]);
+      await tx7.wait();
+    });
+
+    it("should burn token if id is valid", async () => {
+      expect(await contract.getBalance(4)).to.be.equal(new BigNumber.from("5"));
+      expect(await contract.getBalance(5)).to.be.equal(new BigNumber.from("5"));
+      expect(await contract.getBalance(6)).to.be.equal(new BigNumber.from("5"));
+
+      const burnTx = await contract.burnToken(4, 3);
+      await burnTx.wait();
+
+      const burnTx2 = await contract.burnToken(5, 3);
+      await burnTx2.wait();
+
+      const burnTx3 = await contract.burnToken(6, 3);
+      await burnTx3.wait();
+
+      expect(await contract.getBalance(4)).to.be.equal(new BigNumber.from("2"));
+      expect(await contract.getBalance(5)).to.be.equal(new BigNumber.from("2"));
+      expect(await contract.getBalance(6)).to.be.equal(new BigNumber.from("2"));
+    });
+
+    it("should revert if id is invalid", async () => {
+      for(let i = 0; i < 4; i++){
+        await expect(contract.burnToken(i, 3)).to.be.revertedWith(
+          "invalid tokens"
+        );
+      }
+    })
   });
 });
