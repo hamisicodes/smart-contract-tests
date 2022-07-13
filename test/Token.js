@@ -97,4 +97,153 @@ describe("Token", async () => {
       });
     });
   });
+
+  describe("ForgeToken", async () => {
+    beforeEach(async () => {
+      const tx1 = await contract.mintToken(0, 20);
+      await tx1.wait();
+
+      provider.send("evm_increaseTime", [60 + 1]);
+
+      const tx2 = await contract.mintToken(1, 20);
+      await tx2.wait();
+
+      provider.send("evm_increaseTime", [60 + 1]);
+
+      const tx3 = await contract.mintToken(2, 20);
+      await tx3.wait();
+    });
+
+    context("mintThree", async () => {
+      it("should forge three when the combination is correct", async () => {
+        expect(await contract.getBalance(3)).to.be.equal(
+          new BigNumber.from("0")
+        );
+
+        let tx = await contract.mintThree([0, 1], [5, 5]);
+        await tx.wait();
+
+        expect(await contract.getBalance(3)).to.be.equal(
+          new BigNumber.from("5")
+        );
+      });
+
+      it("should revert forge when more than 2 combinations are given", async () => {
+        await expect(
+          contract.mintThree([0, 1, 2], [10, 10, 10])
+        ).to.be.revertedWith("Only 2 tokens can be burned");
+      });
+
+      it("should revert forge when there is an invalid tokens", async () => {
+        await expect(contract.mintThree([0, 2], [10, 10])).to.be.revertedWith(
+          "invalid tokens"
+        );
+      });
+
+      it("should revert forge when same amounts are not provided", async () => {
+        await expect(contract.mintThree([0, 1], [10, 5])).to.be.revertedWith(
+          "same amounts required"
+        );
+      });
+    });
+
+    context("mintFour", async () => {
+      it("should forge four when the combination is correct", async () => {
+        expect(await contract.getBalance(4)).to.be.equal(
+          new BigNumber.from("0")
+        );
+
+        let tx = await contract.mintFour([1, 2], [5, 5]);
+        await tx.wait();
+
+        expect(await contract.getBalance(4)).to.be.equal(
+          new BigNumber.from("5")
+        );
+      });
+
+      it("should revert forge when more than 2 combinations are given", async () => {
+        await expect(
+          contract.mintFour([0, 1, 2], [10, 10, 10])
+        ).to.be.revertedWith("Only 2 tokens can be burned");
+      });
+
+      it("should revert forge when there is an invalid tokens", async () => {
+        await expect(contract.mintFour([1, 0], [10, 10])).to.be.revertedWith(
+          "invalid tokens"
+        );
+      });
+
+      it("should revert forge when same amounts are not provided", async () => {
+        await expect(contract.mintFour([1, 2], [10, 5])).to.be.revertedWith(
+          "same amounts required"
+        );
+      });
+    });
+
+    context("mintFive", async () => {
+      it("should forge five when the combination is correct", async () => {
+        expect(await contract.getBalance(5)).to.be.equal(
+          new BigNumber.from("0")
+        );
+
+        let tx = await contract.mintFive([0, 2], [5, 5]);
+        await tx.wait();
+
+        expect(await contract.getBalance(5)).to.be.equal(
+          new BigNumber.from("5")
+        );
+      });
+
+      it("should revert forge when more than 2 combinations are given", async () => {
+        await expect(
+          contract.mintFive([0, 1, 2], [10, 10, 10])
+        ).to.be.revertedWith("Only 2 tokens can be burned");
+      });
+
+      it("should revert forge when there is an invalid tokens", async () => {
+        await expect(contract.mintFive([0, 1], [10, 10])).to.be.revertedWith(
+          "invalid tokens"
+        );
+      });
+
+      it("should revert forge when same amounts are not provided", async () => {
+        await expect(contract.mintFive([0, 2], [10, 5])).to.be.revertedWith(
+          "same amounts required"
+        );
+      });
+    });
+
+    context("mintSix", async () => {
+      it("should forge six when the combination is correct", async () => {
+        expect(await contract.getBalance(6)).to.be.equal(
+          new BigNumber.from("0")
+        );
+
+        let tx = await contract.mintSix([0, 1, 2], [5, 5, 5]);
+        await tx.wait();
+
+        expect(await contract.getBalance(6)).to.be.equal(
+          new BigNumber.from("5")
+        );
+      });
+
+      it("should revert forge when more/less than 3 combinations are given", async () => {
+        await expect(contract.mintSix([0, 1], [10, 10])).to.be.revertedWith(
+          "Only 3 tokens can be burned"
+        );
+      });
+
+      it("should revert forge when there is an invalid tokens", async () => {
+        await expect(contract.mintSix([0, 1, 3], [10, 10, 10])).to.be.revertedWith(
+          "invalid tokens"
+        );
+      });
+
+      it("should revert forge when same amounts are not provided", async () => {
+        await expect(contract.mintSix([0, 1, 2], [10, 5, 10])).to.be.revertedWith(
+          "same amounts required"
+        );
+      });
+    });
+  });
 });
