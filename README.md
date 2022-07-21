@@ -1,13 +1,21 @@
-# Sample Hardhat Project
+## Implementing unit tests for the ERC1155 contract
 
-This project demonstrates a basic Hardhat use case. It comes with a sample contract, a test for that contract, and a script that deploys that contract.
+```javascript
+npx hardhat test // to run tests
+npx hardhat coverage // to view  test coverage
 
-Try running some of the following tasks:
-
-```shell
-npx hardhat help
-npx hardhat test
-GAS_REPORT=true npx hardhat test
-npx hardhat node
-npx hardhat run scripts/deploy.js
 ```
+- You can also view the coverage report on your browser
+
+```bash
+$ browse coverage/lcov-report/index.html
+```
+------------|----------|----------|----------|----------|----------------|
+File        |  % Stmts | % Branch |  % Funcs |  % Lines |Uncovered Lines |
+------------|----------|----------|----------|----------|----------------|
+ contracts/ |      100 |      100 |      100 |      100 |                |
+  Token.sol |      100 |      100 |      100 |      100 |                |
+------------|----------|----------|----------|----------|----------------|
+All files   |      100 |      100 |      100 |      100 |                |
+------------|----------|----------|----------|----------|----------------|
+
