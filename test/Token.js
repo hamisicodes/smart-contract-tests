@@ -332,7 +332,7 @@ describe("Token", async () => {
     });
 
     it("should trade token for either token 0, 1 or 2", async () => {
-      const tradeFor = Math.floor(Math.random() * 2); //random number between 0 and 2 (both included)
+      const tradeFor = Math.floor(Math.random() * 3); //random number between 0 and 2 (both included)
       const initialBalance = await contract.getBalance(tradeFor);
 
       for (let i = 0; i <= 6; i++) {
@@ -354,7 +354,24 @@ describe("Token", async () => {
         );
       }
 
-      expect(await contract.getBalance(tradeFor)).to.be.equal(  // no change in balance 
+      expect(await contract.getBalance(tradeFor)).to.be.equal(
+        // no change in balance
+        new BigNumber.from(initialBalance)
+      );
+    });
+
+    it("should revert if invalid token to trade for is provided", async () => {
+      const tradeFor = Math.floor(Math.random() * 4) + 3; //random number between 3 and 6 (both included)
+      const initialBalance = await contract.getBalance(tradeFor);
+
+      for (let i = 0; i <= 6; i++) {
+        await expect(contract.tradeToken(i, tradeFor, 1)).to.be.revertedWith(
+          "invalid token to trade for"
+        );
+      }
+
+      expect(await contract.getBalance(tradeFor)).to.be.equal(
+        // no change in balance
         new BigNumber.from(initialBalance)
       );
     });
