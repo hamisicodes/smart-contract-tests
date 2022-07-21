@@ -295,11 +295,61 @@ describe("Token", async () => {
     });
 
     it("should revert if id is invalid", async () => {
-      for(let i = 0; i < 4; i++){
+      for (let i = 0; i < 4; i++) {
         await expect(contract.burnToken(i, 3)).to.be.revertedWith(
           "invalid tokens"
         );
       }
+    });
+  });
+
+  describe("tradeToken", async () => {
+    beforeEach(async () => {
+      const tx1 = await contract.mintToken(0, 20);
+      await tx1.wait();
+
+      provider.send("evm_increaseTime", [60 + 1]);
+
+      const tx2 = await contract.mintToken(1, 20);
+      await tx2.wait();
+
+      provider.send("evm_increaseTime", [60 + 1]);
+
+      const tx3 = await contract.mintToken(2, 20);
+      await tx3.wait();
+
+      const tx4 = await contract.mintThree([0, 1], [5, 5]);
+      await tx4.wait();
+
+      const tx5 = await contract.mintFour([1, 2], [5, 5]);
+      await tx5.wait();
+
+      const tx6 = await contract.mintFive([0, 2], [5, 5]);
+      await tx6.wait();
+
+      const tx7 = await contract.mintSix([0, 1, 2], [5, 5, 5]);
+      await tx7.wait();
+    });
+
+    it("should trade token for either token 0, 1 or 2", async () => {
+      const tradeFor =  Math.floor(Math.random() * 2) ; //random number between 0 and 2 (both included)
+      const initialBalance = await contract.getBalance(tradeFor)
+
+      console.log(`tradeFor is ${tradeFor}`);
+      for (let i = 0; i <= 6; i++){
+        if (i == tradeFor){
+          continue
+        }
+        await expect(contract.tradeToken(i, tradeFor, 3)).to.not.be
+          .reverted;
+      }
+
+      expect(await contract.getBalance(tradeFor)).to.be.greaterThan(
+        new BigNumber.from(initialBalance)
+      );
+
     })
+
+
   });
 });
