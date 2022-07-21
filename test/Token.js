@@ -332,24 +332,31 @@ describe("Token", async () => {
     });
 
     it("should trade token for either token 0, 1 or 2", async () => {
-      const tradeFor =  Math.floor(Math.random() * 2) ; //random number between 0 and 2 (both included)
-      const initialBalance = await contract.getBalance(tradeFor)
+      const tradeFor = Math.floor(Math.random() * 2); //random number between 0 and 2 (both included)
+      const initialBalance = await contract.getBalance(tradeFor);
 
-      console.log(`tradeFor is ${tradeFor}`);
-      for (let i = 0; i <= 6; i++){
-        if (i == tradeFor){
-          continue
-        }
-        await expect(contract.tradeToken(i, tradeFor, 3)).to.not.be
-          .reverted;
+      for (let i = 0; i <= 6; i++) {
+        await expect(contract.tradeToken(i, tradeFor, 3)).to.not.be.reverted;
       }
 
       expect(await contract.getBalance(tradeFor)).to.be.greaterThan(
         new BigNumber.from(initialBalance)
       );
+    });
 
-    })
+    it("should revert if amount is beyond balance", async () => {
+      const tradeFor = Math.floor(Math.random() * 2); //random number between 0 and 2 (both included)
+      const initialBalance = await contract.getBalance(tradeFor);
 
+      for (let i = 0; i <= 6; i++) {
+        await expect(contract.tradeToken(i, tradeFor, 100)).to.be.revertedWith(
+          "Not enough balance to trade"
+        );
+      }
 
+      expect(await contract.getBalance(tradeFor)).to.be.equal(  // no change in balance 
+        new BigNumber.from(initialBalance)
+      );
+    });
   });
 });
