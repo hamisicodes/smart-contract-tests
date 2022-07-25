@@ -5,7 +5,7 @@ const { BigNumber } = ethers;
 describe("Token", async () => {
   let contract = null;
   let accounts = null;
-  let provider = await ethers.provider;
+  let provider = ethers.provider;
 
   beforeEach(async () => {
     accounts = await ethers.getSigners();
