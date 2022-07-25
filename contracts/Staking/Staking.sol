@@ -4,7 +4,7 @@ pragma solidity ^0.8.7;
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "./FreeNFT.sol";
-import "./Token.sol";
+import "./SimpleToken.sol";
 
 contract Staking {
     mapping (uint256 => address) private _stakings;
