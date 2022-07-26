@@ -23,4 +23,14 @@ describe("SimpleToken", async () => {
         expect(await contract.symbol()).to.be.equal("MT");
     })
   })
+
+  describe("mint", async () => {
+    it("should be able to mint token for any address", async () => {
+    
+    for(let i = 0; i < accounts.length; i++){
+      await expect(contract.mint(accounts[i].address, 100)).to.not.be.reverted;
+    }
+
+    })
+  })
 });
