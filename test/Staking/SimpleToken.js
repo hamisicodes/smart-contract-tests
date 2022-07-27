@@ -5,10 +5,8 @@ const { BigNumber } = ethers;
 describe("SimpleToken", async () => {
   let contract = null;
   let accounts = null;
-  let provider = ethers.provider;
   const ATTACKER_ID = 2; 
   const DEPLOYER_ID = 0;
-
 
   beforeEach(async () => {
     accounts = await ethers.getSigners();
