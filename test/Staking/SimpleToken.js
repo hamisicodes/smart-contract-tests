@@ -6,11 +6,14 @@ describe("SimpleToken", async () => {
   let contract = null;
   let accounts = null;
   let provider = ethers.provider;
+  const ATTACKER_ID = 2; 
+  const DEPLOYER_ID = 0;
+
 
   beforeEach(async () => {
     accounts = await ethers.getSigners();
     const ContractFactory = await ethers.getContractFactory("SimpleToken");
-    contract = await ContractFactory.deploy();
+    contract = await ContractFactory.connect(accounts[DEPLOYER_ID]).deploy();
     await contract.deployed()
   });
 
@@ -31,6 +34,22 @@ describe("SimpleToken", async () => {
       await expect(contract.mint(accounts[i].address, 100)).to.not.be.reverted;
     }
 
+    })
+  })
+
+  describe("viewBalance", async () => {
+    it("should return balance of the contract", async () => {
+      expect(await contract.viewBalance()).to.be.equal(
+        new BigNumber.from("0")
+      );
+
+    })
+
+    it("should only allow the deployer/owner to view contract balance", async () => {
+      await expect(contract.connect(accounts[ATTACKER_ID]).viewBalance()).to.be
+        .reverted;
+
+      await expect(contract.connect(accounts[DEPLOYER_ID]).viewBalance()).to.not.be.reverted;
     })
   })
 });
